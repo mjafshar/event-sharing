@@ -1,0 +1,80 @@
+<div class="container">
+
+  <%= content_tag :div, "", id: "start_coords", data: {info: "#{@start.lat},#{@start.lon}"} %>
+  <%= content_tag :div, "", id: "end_coords", data: {info: "#{@end.lat},#{@end.lon}"} %>
+  <div id="ride_info">
+    <div id="ride_details">
+      <% if @user_ride && @user_ride.paid == false %>
+        <div class="paynow">
+          <script async="async" src="https://www.paypalobjects.com/js/external/paypal-button.min.js?merchant=<%= @ride.driver.email %>"
+            data-button="paynow"
+            data-name=<%= @ride.name %>
+            data-quantity="1"
+            data-amount=<%= @ride.price_per_rider.to_s %>
+            data-currency="USD"
+            data-shipping="0"
+            data-tax="0"
+            data-callback="/rides/user_rides/<%= @user_ride.id %>/payment"
+            data-env="sandbox"
+          ></script>
+        </div>
+      <% elsif @user_ride && @user_ride.paid == true %>
+        <h3 class="">PAID</h3>
+      <% else %>
+        <h3 class="">Sign Up</h3>
+      <% end %>
+      <h2>Destination: <%= @ride.name %></h2>
+      <% if current_user == @ride.driver %>
+        <div class='btn btn-primary navbar-btn btn-lg right-align'><%= link_to 'Invite Riders', invite_riders_path %></div>
+        <%= button_to 'Delete Trip', @ride, method: 'delete', class: 'btn btn-danger navbar-btn btn-lg right-align' %>
+      <% else %>
+        <% if @ride.riders.include?(current_user) %>
+          <h3 class='notification'>You've requested this ride, please wait for driver's approval</span>
+        <% else %>
+          <%= form_tag "/users/user_rides/#{@user_ride.id}/rider_approve", method: 'post', class: 'driver-approve' do %>
+            <%= submit_tag "Request this ride", class: 'driver-approve-submit btn btn-success' %>
+          <% end %>
+        <% end %>
+      <% end %>
+      <% if @ride.price_per_rider == 0 %>
+        <h4>No one has signed up for this ride.</h4>
+      <% else %>
+        <h4>Price per person: $<%= @ride.price_per_rider %></h4>
+      <% end %>
+      <h5>Organized by <%= @ride.driver.name %></h5>
+      <h5>Leaves at <%= @ride.start_time.strftime("%l:%M %p") %> on <%= @ride.start_time.strftime("%b %d, %Y") %> on and returns at <%= @ride.end_time.strftime("%l:%M %p") %> on <%= @ride.end_time.strftime("%b %d, %Y") %></h5>
+    </div>
+
+    <div id="map-canvas">
+    </div>
+  </div>
+  <div class="driver_accepted">
+    <div class="table_title"><h4>Invited Riders</h4></div>
+    <table class="table">
+      <thead>
+        <th class='name'>Rider Name</th>
+      </thead>
+      <tbody class="riders_tbody">
+        <% @accepted_riders.each do |rider| %>
+          <%= render 'rider_row', :rider => rider %>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+  <% if current_user == @ride.driver %>
+    <div class="rider_accepted">
+      <div class="table_title"><h4>People requested this ride</h4></div>
+      <table class="table">
+        <thead>
+          <th class='name'>Rider Name</th>
+          <th class='name'>Accept</th>
+        </thead>
+        <tbody class="riders_tbody">
+          <% @requesting_riders.each do |rider| %>
+            <%= render 'accept_rider_row', :rider => rider %>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% end %>
+</div>

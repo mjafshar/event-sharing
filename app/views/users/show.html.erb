@@ -1,0 +1,65 @@
+<div class="container">
+  <div class="available">
+    <div class="table_title"><h4>Available Rides</h4></div>
+    <table class="table">
+      <thead>
+        <th class='name'>Name</th>
+        <th class='name'>Driver</th>
+        <th class='time'>Start Time</th>
+        <th class='time'>End Time</th>
+        <th class='price'>Cost</th>
+      </thead>
+      <tbody class="available_tbody">
+        <% @available_rides.each do |ride| %>
+          <%= render 'available_ride_row', :ride => ride %>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+  <% if current_user == User.find(params[:id]) %>
+    <div class="unaccepted">
+      <div class="table_title"><h4>Confirm Trips</h4></div>
+      <table class="table">
+        <thead>
+          <th class='name'>Destination</th>
+          <th class='accepted-status'>Accepted Status</th>
+        </thead>
+        <tbody class="rides_tbody">
+          <% if @unaccepted_rides %>
+            <% @unaccepted_rides.each do |user_ride| %>
+              <%= render 'unaccepted_ride_row', :user_ride => user_ride %>
+            <% end %>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% end %>
+  <div class="provided">
+    <div class="table_title"><h4>Trips I'll be driving</h4></div>
+    <table class="table">
+      <thead>
+        <th class='name'>Destination</th>
+        <th class='time'>Start Date</th>
+      </thead>
+      <tbody class="rides_tbody">
+        <% @user.provided_rides.each do |ride| %>
+          <%= render 'user_ride_row', :ride => ride %>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+  <div class="booked">
+    <div class="table_title"><h4>Trips I'll be attending</h4></div>
+    <table class="table">
+      <thead>
+        <th class='name'>Destination</th>
+        <th class='time'>Start Date</th>
+      </thead>
+      <tbody class="rides_tbody">
+        <% @user.booked_rides.each do |ride| %>
+          <%= render 'user_ride_row', :ride => ride %>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
